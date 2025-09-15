@@ -1,14 +1,68 @@
+#### Terraform Backend Configuration Section ###
+terraform {
+  backend "azurerm" {
+    resource_group_name  = "tf-backend-rg" # Replace with your backend resource group name
+    storage_account_name = "storage_account_name" # Replace with your backend storage account name
+    container_name       = "sls-tf-backend-container" # Replace with your backend container name
+    key                  = "terraform.tfstate" # Replace with your backend key
+    use_azuread_auth     = true
+  }
+}
+
+
+### Variables Section ###
+
+variable "location" {
+  description = "The Azure region where resources will be created"
+  type        = string
+}
+
+variable "vnet_address_space" {
+  description = "The address space for the virtual network"
+  type        = string
+}
+
+variable "bastion_enabled" {
+  description = "Flag to enable or disable the Azure Bastion host"
+  type        = bool
+  default     = true
+}
+
+variable "troubleshooting_vm_enabled" {
+  description = "Flag to enable or disable the troubleshooting VM"
+  type        = bool
+  default     = true
+}
+
+variable "admin_username" {
+  description = "The admin username for the troubleshooting VM"
+  type        = string
+  sensitive   = true
+}
+
+variable "admin_password" {
+  description = "The admin password for the troubleshooting VM"
+  type        = string
+  sensitive   = true
+}
+
+variable "subscription_id" {
+  description = "The Azure subscription ID where resources will be created"
+  type        = string
+  sensitive   = true
+}
+
 ### Module Invocation Section ###
 
 module "azure_vnet" {
   source                     = "./module"
-  location                   = "eastus2"
-  vnet_address_space         = "10.0.0.0/24"
-  bastion_enabled            = true
-  troubleshooting_vm_enabled = true
-  admin_username             = "your-username"
-  admin_password             = "your-password"
-  subscription_id            = "your-subscription-id"
+  location                   = var.location
+  vnet_address_space         = var.vnet_address_space
+  bastion_enabled            = var.bastion_enabled
+  troubleshooting_vm_enabled = var.troubleshooting_vm_enabled
+  admin_username             = var.admin_username
+  admin_password             = var.admin_password
+  subscription_id            = var.subscription_id
 }
 
 ### Output Section ###

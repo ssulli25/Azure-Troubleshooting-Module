@@ -52,10 +52,12 @@ variable "client_secret" {
 variable "build" {}
 
 #############################################################################
-# Playbook
+# Playbooks & Setup Scripts
 #############################################################################
 
-variable "playbook_file" {}
+# variable "playbook_file" {}
+
+variable "powershell_setup_scripts" {}
 
 
 ### Build file for Packer ###
@@ -102,10 +104,7 @@ source "azure-arm" "build" {
 build {
   sources = ["source.azure-arm.build"]
 
-  provisioner "ansible" {
-    playbook_file = var.playbook_file
-    extra_arguments = [
-      "ansible_winrm_server_cert_validation=ignore"
-    ]
+  provisioner "powershell" {
+    script = var.powershell_setup_script
   }
 }

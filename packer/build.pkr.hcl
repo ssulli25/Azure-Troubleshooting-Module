@@ -75,10 +75,14 @@ source "azure-arm" "build" {
   managed_image_resource_group_name = var.build["az_configs"].managed_image_resource_group_name
   os_type                           = var.build["az_configs"].os_type
   vm_size                           = var.build["az_configs"].vm_size
+  polling_duration_timeout          = var.build["az_configs"].polling_duration_timeout
   ssh_username                      = var.build["az_configs"].communicator.type == "ssh" ? var.build["az_configs"]["communicator"].ssh_username : null
   ssh_password                      = var.build["az_configs"].communicator.type == "ssh" ? var.build["az_configs"]["communicator"].ssh_password : null
   winrm_password                    = var.build["az_configs"].communicator.type != "ssh" ? var.build["az_configs"]["communicator"].winrm_password : null
   winrm_username                    = var.build["az_configs"].communicator.type != "ssh" ? var.build["az_configs"]["communicator"].winrm_username : null
+  winrm_use_ssl                     = var.build["az_configs"].communicator.type != "ssh" ? var.build["az_configs"]["communicator"].winrm_use_ssl : null
+  winrm_insecure                    = var.build["az_configs"].communicator.type != "ssh" ? var.build["az_configs"]["communicator"].winrm_insecure : null
+  winrm_timeout                     = var.build["az_configs"].communicator.type != "ssh" ? var.build["az_configs"]["communicator"].winrm_timeout : null
 
   dynamic "shared_image_gallery_destination" {
     for_each = contains(keys(var.build), "shared_image_galleries") ? var.build["shared_image_galleries"] : {}
@@ -100,6 +104,8 @@ build {
 
   provisioner "ansible" {
     playbook_file = var.playbook_file
+    extra_arguments = [
+      "ansible_winrm_server_cert_validation=ignore"
+    ]
   }
-
 }
